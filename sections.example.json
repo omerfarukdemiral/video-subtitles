@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "01-intro",
+    "title": "Introduction",
+    "start": "00:00:00,000",
+    "end": "00:15:22,260"
+  },
+  {
+    "slug": "02-demo",
+    "title": "Live demo",
+    "start": "00:15:22,260",
+    "end": "00:34:48,680"
+  },
+  {
+    "slug": "03-discussion",
+    "title": "Discussion",
+    "start": "00:34:48,680",
+    "end": "00:47:08,240"
+  }
+]

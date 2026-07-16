@@ -1,0 +1,29 @@
+# Working directories the scripts create
+work/
+vsub_work/
+sections/
+out/
+
+# Media — never commit source video or renders
+*.mp4
+*.mkv
+*.webm
+*.mov
+*.wav
+*.m4a
+*.srt
+!**/*.example.srt
+
+# Whisper models (GBs)
+*.bin
+ggml-*.bin
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
