@@ -167,7 +167,14 @@ def cmd_keyframes(a):
 
 def snap_down(t, keys):
     """Nearest keyframe at or before t. Cutting early keeps every word; cutting
-    late clips the first syllable of the section."""
+    late clips the first syllable of the section.
+
+    No keyframes (--srt-only) means nothing is being cut, so there is nothing to
+    snap to: return t unchanged. Returning 0.0 here would make every section's
+    delta its own start offset and shift all its subtitles by that much.
+    """
+    if not keys:
+        return t
     prev = [k for k in keys if k <= t + 1e-6]
     return prev[-1] if prev else 0.0
 
@@ -176,21 +183,40 @@ def cmd_split(a):
     spec = json.load(open(a.sections, encoding="utf-8"))
     os.makedirs(a.outdir, exist_ok=True)
 
-    keys = keyframe_times(a.video)
-    if not keys:
-        print("  ERROR: could not read keyframes", file=sys.stderr)
-        return 1
+    # Keyframes only matter because a stream-copy cut has to start on one.
+    # With --srt-only nothing is cut, so don't demand a readable video.
+    if a.srt_only:
+        keys = []
+    else:
+        keys = keyframe_times(a.video)
+        if not keys:
+            print(f"  ERROR: could not read keyframes from {a.video!r}.\n"
+                  "  Is that really a video file? (split takes VIDEO then SRT.)\n"
+                  "  Use --srt-only to write section SRTs without cutting.",
+                  file=sys.stderr)
+            return 1
 
     cues = parse(a.srt)
-    bounds = [t2s(s["start"]) for s in spec] + [t2s(spec[-1]["end"])]
-    snapped = [snap_down(b, keys) for b in bounds[:-1]] + [bounds[-1]]
 
     manifest = []
     for i, sec in enumerate(spec):
-        s0_want, s0 = bounds[i], snapped[i]
-        s1 = snapped[i + 1]
-        delta = s0_want - s0   # cut starts this much earlier than the boundary
+        # Each section's own start/end. Deriving the end from the NEXT section's
+        # start instead looks equivalent, but silently swallows any gap between
+        # sections -- which is exactly how you drop an ad break: by leaving a
+        # hole in the spec. That bug ships a section whose video contains the ad
+        # while its subtitles skip it.
+        s0_want = t2s(sec["start"])
+        s1 = t2s(sec["end"])
+
+        # Only the START must land on a keyframe; that is what makes the stream
+        # copy exact. The end can fall anywhere -- ffmpeg simply stops there.
+        s0 = snap_down(s0_want, keys)
+        delta = s0_want - s0   # cut begins this much earlier than the boundary
         slug = sec["slug"]
+
+        if s1 <= s0_want:
+            print(f"  ERROR: {slug} ends at or before it starts", file=sys.stderr)
+            return 1
 
         # Section SRT, rebased so the cut's first frame is t=0.
         out = []

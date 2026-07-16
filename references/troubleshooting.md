@@ -109,6 +109,36 @@ python3 scripts/srt_tools.py keyframes video.mp4
 Snap **backwards**. Cutting forward clips the first syllable of the section;
 cutting back only adds a second or two of overlap.
 
+### A section's video runs long and contains an ad break
+
+Fixed in `srt_tools.py`, but the shape is worth knowing, because the symptom is
+quiet: the section's **subtitles** are right while its **video** runs long.
+
+The bug took a section's end from the *next* section's start instead of its own
+`end` field. For back-to-back sections those are identical, so it looks correct
+and tests clean. It only breaks when the spec has a **gap** — which is exactly
+how you drop an ad read, a sponsor break, or any stretch you don't want:
+
+```json
+[{"slug":"05-roles",  "start":"00:31:44,780", "end":"00:39:10,620"},
+ {"slug":"06-latent", "start":"00:40:21,740", "end":"00:47:42,140"}]
+                       ^^^^^^^^^^^^^^^^^^^^ a 71-second ad lives in this gap
+```
+
+Section 5 ran to 40:21 instead of 39:10 and shipped the ad, while its subtitles
+skipped it — so the ad played in silence.
+
+Only the **start** of a cut has to land on a keyframe; that is what makes the
+stream copy exact. The end can fall anywhere, ffmpeg simply stops there. Snapping
+the end buys nothing and hides bugs like this.
+
+Whenever sections are not contiguous, check the manifest against your spec:
+
+```
+python3 -c "import json; [print(s['slug'], round(s['duration'],1)) \
+  for s in json.load(open('sections/manifest.json'))]"
+```
+
 ---
 
 ## Transcription
