@@ -11,6 +11,60 @@ macOS, Windows, and Linux.
 you: add Turkish subtitles to https://x.com/user/status/123
 ```
 
+## How it works
+
+Scripts do the mechanical work. The model does the two things a script cannot:
+**translate well** and **look at the result**. Each step has a trap it already
+knows about — every one of them cost real time to discover.
+
+```mermaid
+flowchart LR
+    SRC(["X · YouTube<br/>local file"]):::io --> P
+
+    subgraph P ["1 · Prepare"]
+        direction TB
+        DOC["<b>doctor.py</b><br/>environment + per-OS fixes"]:::script
+        FETCH["<b>fetch.py</b><br/>download · probe · audio"]:::script
+        TRANS["<b>transcribe.py</b><br/>Whisper, source language"]:::script
+        DOC --> FETCH --> TRANS
+    end
+
+    subgraph T ["2 · Translate"]
+        direction TB
+        PROOF["<b>proofread</b><br/>fix what the ASR mangled"]:::model
+        GUIDE["<b>style guide</b><br/>pin the terminology"]:::model
+        XL["<b>translate</b><br/>parallel chunks, one guide"]:::model
+        VAL["<b>srt_tools.py validate</b><br/>cue by cue vs source"]:::script
+        PROOF --> GUIDE --> XL --> VAL
+    end
+
+    subgraph R ["3 · Render"]
+        direction TB
+        FRAME["<b>look at a frame</b><br/>before encoding minutes"]:::model
+        BURN["<b>burn.py</b><br/>hard: pixels · soft: track"]:::script
+        VER["<b>verify</b><br/>frame + duration"]:::model
+        FRAME --> BURN --> VER
+    end
+
+    P --> T --> R --> OUT(["subtitled<br/>video"]):::io
+
+    classDef script fill:#1f6feb,stroke:#58a6ff,color:#ffffff
+    classDef model fill:#8957e5,stroke:#bc8cff,color:#ffffff
+    classDef io fill:#238636,stroke:#3fb950,color:#ffffff
+
+    %% Neutral phase boxes. Mermaid's default subgraph fill is a pale yellow
+    %% that reads as a glaring block on GitHub's dark theme.
+    style P fill:transparent,stroke:#8b949e,stroke-dasharray:3 3
+    style T fill:transparent,stroke:#8b949e,stroke-dasharray:3 3
+    style R fill:transparent,stroke:#8b949e,stroke-dasharray:3 3
+```
+
+<sub>**Blue** = a script does it · **purple** = the model does it — translating well and looking at the result are the two things a script can't do.</sub>
+
+Long videos can be split into sections first. Cuts snap backwards to keyframes,
+so the stream copy is exact and lossless — and a gap you leave in the section
+spec drops an ad break out of the output entirely.
+
 ## Why not just use an auto-caption tool
 
 Auto-captioning is fine until the video is technical. Machine translation
