@@ -37,9 +37,23 @@ It also knows the failure modes, because they all happened while building it:
 
 ## Install
 
+As a plugin — this also gets you updates via `/plugin marketplace update`:
+
+```
+/plugin marketplace add omerfarukdemiral/video-subtitles
+/plugin install video-subtitles@ofd-plugins
+```
+
+Or clone it straight into your skills directory:
+
 ```bash
-git clone https://github.com/USER/video-subtitles.git \
+git clone https://github.com/omerfarukdemiral/video-subtitles.git \
   ~/.claude/skills/video-subtitles
+```
+
+Either way, check your environment before the first run:
+
+```bash
 python3 ~/.claude/skills/video-subtitles/scripts/doctor.py
 ```
 

@@ -1,0 +1,18 @@
+{
+  "name": "video-subtitles",
+  "displayName": "Video Subtitles",
+  "version": "1.1.0",
+  "description": "Transcribe a video and add translated subtitles in any language, burned into the picture or as a selectable track. Takes an X/Twitter, YouTube, or any yt-dlp URL, or a local file.",
+  "author": {
+    "name": "Ömer Faruk Demiral",
+    "url": "https://github.com/omerfarukdemiral"
+  },
+  "homepage": "https://github.com/omerfarukdemiral/video-subtitles",
+  "repository": "https://github.com/omerfarukdemiral/video-subtitles",
+  "license": "MIT",
+  "keywords": [
+    "subtitles", "captions", "translation", "transcription", "whisper",
+    "ffmpeg", "video", "srt", "yt-dlp", "dubbing", "localization",
+    "altyazi", "ceviri"
+  ]
+}

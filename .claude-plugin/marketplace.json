@@ -1,0 +1,29 @@
+{
+  "name": "ofd-plugins",
+  "owner": {
+    "name": "Ömer Faruk Demiral"
+  },
+  "description": "Claude Code plugins by @omerfrkdemiral",
+  "plugins": [
+    {
+      "name": "video-subtitles",
+      "source": "./",
+      "description": "Transcribe a video and add translated subtitles in any language, burned in or as a soft track. Knows the traps: Homebrew ffmpeg ships without libass, libass scales SRT against a 288px canvas, and Whisper mangles product names consistently.",
+      "version": "1.1.0",
+      "author": {
+        "name": "Ömer Faruk Demiral",
+        "url": "https://github.com/omerfarukdemiral"
+      },
+      "category": "media",
+      "tags": [
+        "subtitles",
+        "captions",
+        "translation",
+        "whisper",
+        "ffmpeg",
+        "video",
+        "srt"
+      ]
+    }
+  ]
+}
